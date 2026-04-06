@@ -1,0 +1,132 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 0%;
+    --foreground: 0 0% 93%;
+
+    --card: 0 0% 6%;
+    --card-foreground: 0 0% 93%;
+
+    --popover: 0 0% 6%;
+    --popover-foreground: 0 0% 93%;
+
+    --primary: 0 72% 51%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 15 80% 50%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 0 0% 14%;
+    --muted-foreground: 0 0% 55%;
+
+    --accent: 0 90% 64%;
+    --accent-foreground: 0 0% 5%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 0 0% 16%;
+    --input: 0 0% 16%;
+    --ring: 0 72% 51%;
+
+    --radius: 0.75rem;
+
+    --glow-primary: 0 72% 51%;
+    --glow-accent: 0 90% 64%;
+    --glow-secondary: 15 80% 50%;
+
+    --sidebar-background: 0 0% 0%;
+    --sidebar-foreground: 0 0% 93%;
+    --sidebar-primary: 0 72% 51%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 14%;
+    --sidebar-accent-foreground: 0 0% 93%;
+    --sidebar-border: 0 0% 16%;
+    --sidebar-ring: 0 72% 51%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+    font-family: 'Inter', sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Space Grotesk', sans-serif;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  section[id] {
+    scroll-margin-top: 5rem;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-card/40 backdrop-blur-xl border border-border/50 rounded-2xl;
+    box-shadow: 0 8px 32px hsla(var(--glow-primary) / 0.08);
+  }
+
+  .glow-border {
+    @apply relative;
+    box-shadow: 0 0 20px hsla(var(--glow-primary) / 0.15),
+                inset 0 0 20px hsla(var(--glow-primary) / 0.05);
+  }
+
+  .text-gradient {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)), hsl(var(--secondary)));
+  }
+
+  .section-padding {
+    @apply py-20 md:py-28 px-4 md:px-8;
+  }
+
+  .neural-bg {
+    background-image:
+      radial-gradient(circle at 20% 50%, hsla(var(--glow-primary) / 0.03) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, hsla(var(--glow-secondary) / 0.02) 0%, transparent 50%),
+      radial-gradient(circle at 50% 80%, hsla(var(--glow-accent) / 0.015) 0%, transparent 50%);
+  }
+
+  .skill-tag {
+    @apply px-3 py-1.5 rounded-lg text-sm font-medium border transition-all duration-300;
+    background: hsla(var(--primary) / 0.1);
+    border-color: hsla(var(--primary) / 0.2);
+    color: hsl(var(--accent));
+  }
+
+  .skill-tag:hover {
+    background: hsla(var(--primary) / 0.2);
+    border-color: hsla(var(--primary) / 0.4);
+    box-shadow: 0 0 15px hsla(var(--glow-accent) / 0.3);
+  }
+}
+
+@layer utilities {
+  .animation-delay-200 { animation-delay: 200ms; }
+  .animation-delay-400 { animation-delay: 400ms; }
+  .animation-delay-600 { animation-delay: 600ms; }
+
+  .animate-blink {
+    animation: blink 1s step-end infinite;
+  }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
