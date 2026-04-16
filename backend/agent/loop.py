@@ -202,6 +202,7 @@ async def _run_loop(messages: list[dict]) -> AsyncIterator[dict]:
 
         # --- 1. Open the stream -------------------------------------------
         try:
+            log.info("Starting turn %d, use_tools=%s", turn + 1, use_tools)
             stream = await _create_stream(messages, use_tools=use_tools)
         except UserFacingError:
             raise
@@ -272,6 +273,12 @@ async def _run_loop(messages: list[dict]) -> AsyncIterator[dict]:
 
         # --- 4. Decide next step based on finish_reason -------------------
         if finish_reason == "tool_calls" and tool_calls:
+            log.info(
+                "Turn %d: %d tool call(s) — %s",
+                turn + 1,
+                len(tool_calls),
+                ", ".join(tc["function"]["name"] for tc in tool_calls),
+            )
             for tc in tool_calls:
                 name = tc["function"]["name"]
                 raw_args = tc["function"]["arguments"] or "{}"
@@ -301,8 +308,10 @@ async def _run_loop(messages: list[dict]) -> AsyncIterator[dict]:
             continue
 
         if finish_reason in ("stop", "length"):
-            if finish_reason == "length":
-                log.info("Response truncated at max_tokens")
+            log.info(
+                "Turn %d: Done (%s) — %d chars streamed",
+                turn + 1, finish_reason, len(collected_content),
+            )
             return
 
         log.warning("Unexpected finish_reason=%r, content=%d chars",

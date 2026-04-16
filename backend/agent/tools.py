@@ -205,8 +205,15 @@ async def execute(tool_name: str, args: dict) -> Any:
     # Notion HTTP and network errors abort the turn with an apology (the user
     # can't do anything about Notion being down). Everything else is returned
     # as an error dict so the LLM can adapt.
+    log.info("calling %s(%s)", tool_name, call_args)
     try:
-        return await fn(**call_args)
+        result = await fn(**call_args)
+        log.debug(
+            "result  %s → %s",
+            tool_name,
+            str(result)[:200] + ("..." if len(str(result)) > 200 else ""),
+        )
+        return result
     except httpx.HTTPStatusError as e:
         # Notion returned 4xx/5xx — auth expired, page deleted, etc.
         log.warning("Notion HTTP %s in %s: %s", e.response.status_code, tool_name, e)

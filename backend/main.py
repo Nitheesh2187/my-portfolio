@@ -27,10 +27,9 @@ from agent import loop as agent_loop  # noqa: E402
 from notion import client as notion_client  # noqa: E402
 from store import sessions  # noqa: E402
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s %(levelname)s %(name)s: %(message)s",
-)
+import logger  # noqa: E402
+logger.setup()
+
 log = logging.getLogger("main")
 
 
