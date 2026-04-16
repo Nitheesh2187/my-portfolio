@@ -5,39 +5,38 @@ import { Button } from "@/components/ui/button";
 
 type Message = { role: "user" | "assistant"; content: string };
 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
 const examplePrompts = [
-  "What projects has Nitheesh worked on?",
-  "What are his strengths?",
-  "Explain his experience with LLMs",
+  "What projects have you worked on?",
+  "What are your strengths?",
+  "Tell me about your experience with LLMs",
 ];
 
-const botResponses: Record<string, string> = {
-  "what projects has nitheesh worked on?":
-    "Nitheesh has built a **Stock Assistance Agent** — an AI-powered stock assistant using FastAPI, React, LangChain, and MCP. It features real-time stock data, fundamental analysis, market news scraping, and a streaming chat interface. He's also worked on multimodal AI pipelines at Skylark Labs covering vision, NLP, and audio domains.",
-  "what are his strengths?":
-    "Nitheesh's key strengths include:\n\n• **Inference Optimization** — Triton + TensorRT achieving 120+ inf/sec at <50ms latency\n• **LLM Deployment** — vLLM serving for large models like Mixtral-8x7B\n• **Full-stack AI** — End-to-end pipeline design from training to production\n• **Multimodal Systems** — Experience across vision, language, and audio",
-  "explain his experience with llms":
-    "Nitheesh has deep experience with LLMs:\n\n• Deployed **Mixtral-8x7B** via vLLM with long context (12k–16k tokens)\n• Built **RAG pipelines** using LangChain, LlamaIndex, and LangGraph\n• Engineered **Whisper-based** transcription pipelines\n• Expertise in **Transformers**, Hugging Face ecosystem, and agentic AI architectures",
-};
+const SESSION_STORAGE_KEY = "chat_session_id";
 
-const getResponse = (input: string): string => {
-  const lower = input.toLowerCase().trim();
-  for (const [key, val] of Object.entries(botResponses)) {
-    if (lower.includes(key.split(" ").slice(0, 3).join(" ")) || key.includes(lower.slice(0, 20))) {
-      return val;
-    }
-  }
-  return "I'm Nitheesh's AI assistant! I can tell you about his projects, skills, experience, and expertise in ML/AI systems. Try asking about his work with LLMs, inference optimization, or his projects!";
+const mintSessionId = () => {
+  const id =
+    typeof crypto !== "undefined" && "randomUUID" in crypto
+      ? crypto.randomUUID()
+      : `sid-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  sessionStorage.setItem(SESSION_STORAGE_KEY, id);
+  return id;
 };
 
 const AIAgentSection = () => {
   const ref = useRef(null);
   const inView = useInView(ref, { once: false, margin: "-100px" });
   const [messages, setMessages] = useState<Message[]>([
-    { role: "assistant", content: "Hi! 👋 I'm Nitheesh's AI assistant. Ask me anything about his experience, skills, or projects!" },
+    { role: "assistant", content: "Hey! 👋 I'm the digital version of Nitheesh. Ask me anything about my experience, skills, or projects!" },
   ]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const [typingStatus, setTypingStatus] = useState<string>("");
+  const [sessionId, setSessionId] = useState<string>(() => {
+    if (typeof window === "undefined") return "";
+    return sessionStorage.getItem(SESSION_STORAGE_KEY) || mintSessionId();
+  });
   const chatEndRef = useRef<HTMLDivElement>(null);
   const isFirstRender = useRef(true);
 
@@ -49,19 +48,124 @@ const AIAgentSection = () => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }, [messages]);
 
+  // Clean up session on tab close / navigate away.
+  useEffect(() => {
+    const handleUnload = () => {
+      const sid = sessionStorage.getItem(SESSION_STORAGE_KEY);
+      if (sid) {
+        navigator.sendBeacon(
+          `${API_URL}/api/session/delete`,
+          new Blob([JSON.stringify({ session_id: sid })], { type: "application/json" }),
+        );
+        sessionStorage.removeItem(SESSION_STORAGE_KEY);
+      }
+    };
+    window.addEventListener("beforeunload", handleUnload);
+    return () => window.removeEventListener("beforeunload", handleUnload);
+  }, []);
+
   const sendMessage = async (text: string) => {
-    if (!text.trim()) return;
+    if (!text.trim() || isTyping) return;
     const userMsg: Message = { role: "user", content: text.trim() };
     setMessages((prev) => [...prev, userMsg]);
     setInput("");
     setIsTyping(true);
+    setTypingStatus("");
 
-    // Simulate typing delay
-    await new Promise((r) => setTimeout(r, 800 + Math.random() * 700));
+    // Ensure a session exists (first render in SSR contexts, etc.).
+    let sid = sessionId;
+    if (!sid) {
+      sid = mintSessionId();
+      setSessionId(sid);
+    }
 
-    const response = getResponse(text);
-    setMessages((prev) => [...prev, { role: "assistant", content: response }]);
-    setIsTyping(false);
+    try {
+      const resp = await fetch(`${API_URL}/api/chat`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          session_id: sid,
+          message: text.trim(),
+        }),
+      });
+
+      if (!resp.ok || !resp.body) {
+        throw new Error("Failed to connect");
+      }
+
+      const reader = resp.body.getReader();
+      const decoder = new TextDecoder();
+      let assistantContent = "";
+      let assistantStarted = false;
+      let buffer = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() ?? "";
+
+        for (const line of lines) {
+          if (!line.startsWith("data: ")) continue;
+          const data = line.slice(6);
+          if (data === "[DONE]") {
+            setTypingStatus("");
+            break;
+          }
+
+          try {
+            const parsed = JSON.parse(data);
+            if (typeof parsed.status === "string") {
+              setTypingStatus(parsed.status);
+            }
+            if (typeof parsed.content === "string" && parsed.content) {
+              if (!assistantStarted) {
+                assistantStarted = true;
+                setIsTyping(false);
+                setTypingStatus("");
+                setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
+              }
+              assistantContent += parsed.content;
+              const content = assistantContent;
+              setMessages((prev) => {
+                const updated = [...prev];
+                updated[updated.length - 1] = { role: "assistant", content };
+                return updated;
+              });
+            }
+          } catch {
+            // skip malformed chunks
+          }
+        }
+      }
+
+      setIsTyping(false);
+      setTypingStatus("");
+    } catch {
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: "Sorry, I'm having trouble connecting right now. Please try again later!" },
+      ]);
+      setIsTyping(false);
+      setTypingStatus("");
+    }
+  };
+
+  const clearChat = () => {
+    // Delete old session on backend (fire-and-forget).
+    if (sessionId) {
+      fetch(`${API_URL}/api/session/delete`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ session_id: sessionId }),
+      }).catch(() => {});
+    }
+    setMessages([
+      { role: "assistant", content: "Hey! 👋 I'm the digital version of Nitheesh. Ask me anything about my experience, skills, or projects!" },
+    ]);
+    setSessionId(mintSessionId());
   };
 
   return (
@@ -89,7 +193,7 @@ const AIAgentSection = () => {
             transition={{ delay: 0.4, duration: 0.5 }}
             className="h-1 bg-gradient-to-r from-primary to-accent rounded-full mx-auto mb-4"
           />
-          <p className="text-muted-foreground">Chat with my AI to learn more about my experience and skills.</p>
+          <p className="text-muted-foreground">Chat with the digital me to learn about my experience and skills.</p>
         </motion.div>
 
         <motion.div
@@ -105,13 +209,13 @@ const AIAgentSection = () => {
                 <Bot size={16} className="text-accent" />
               </div>
               <div>
-                <p className="font-display font-semibold text-sm">Nitheesh's AI Agent</p>
+                <p className="font-display font-semibold text-sm">Digital Nitheesh</p>
                 <p className="text-xs text-accent">Online</p>
               </div>
             </div>
             {messages.length > 1 && (
               <button
-                onClick={() => setMessages([{ role: "assistant", content: "Hi! 👋 I'm Nitheesh's AI assistant. Ask me anything about his experience, skills, or projects!" }])}
+                onClick={clearChat}
                 className="text-muted-foreground hover:text-destructive transition-colors p-2 rounded-lg hover:bg-destructive/10"
                 title="Clear chat"
               >
@@ -150,10 +254,15 @@ const AIAgentSection = () => {
                   <Bot size={14} className="text-accent" />
                 </div>
                 <div className="bg-muted/50 border border-border/50 rounded-2xl px-4 py-3">
-                  <div className="flex gap-1">
-                    <span className="w-2 h-2 rounded-full bg-muted-foreground/50 animate-bounce" />
-                    <span className="w-2 h-2 rounded-full bg-muted-foreground/50 animate-bounce animation-delay-200" />
-                    <span className="w-2 h-2 rounded-full bg-muted-foreground/50 animate-bounce animation-delay-400" />
+                  <div className="flex items-center gap-2">
+                    <div className="flex gap-1">
+                      <span className="w-2 h-2 rounded-full bg-muted-foreground/50 animate-bounce" />
+                      <span className="w-2 h-2 rounded-full bg-muted-foreground/50 animate-bounce animation-delay-200" />
+                      <span className="w-2 h-2 rounded-full bg-muted-foreground/50 animate-bounce animation-delay-400" />
+                    </div>
+                    {typingStatus && (
+                      <span className="text-xs text-muted-foreground">{typingStatus}</span>
+                    )}
                   </div>
                 </div>
               </div>
@@ -186,7 +295,7 @@ const AIAgentSection = () => {
               <input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="Ask me anything about Nitheesh..."
+                placeholder="Ask me anything..."
                 className="flex-1 bg-muted/30 border border-border/50 rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/50"
               />
               <Button type="submit" size="icon" className="rounded-xl bg-primary hover:bg-primary/90 h-11 w-11">
