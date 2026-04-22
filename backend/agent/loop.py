@@ -200,7 +200,7 @@ async def _run_loop(messages: list[dict]) -> AsyncIterator[dict]:
 
         # --- 1. Open the stream -------------------------------------------
         try:
-            log.info("Starting turn %d, use_tools=%s", turn + 1, use_tools)
+            log.info("Starting turn %d", turn + 1)
             stream = await _create_stream(messages, use_tools=use_tools)
         except UserFacingError:
             raise
@@ -235,13 +235,19 @@ async def _run_loop(messages: list[dict]) -> AsyncIterator[dict]:
                 delta = choice.delta
 
                 if delta is not None:
-                    if getattr(delta, "content", None):
+                    tc_delta = getattr(delta, "tool_calls", None)
+
+                    # Only stream content to the user when this delta is NOT
+                    # part of a tool call. Tool-call deltas sometimes carry
+                    # preamble text or leaked `<function=...>` markup that
+                    # shouldn't reach the user.
+                    if getattr(delta, "content", None) and not tc_delta:
                         collected_content += delta.content
                         yield {"content": delta.content}
 
-                    if getattr(delta, "tool_calls", None):
-                        for tc_delta in delta.tool_calls:
-                            merge_tool_call_delta(tool_call_buffers, tc_delta)
+                    if tc_delta:
+                        for tc in tc_delta:
+                            merge_tool_call_delta(tool_call_buffers, tc)
 
                 if choice.finish_reason:
                     finish_reason = choice.finish_reason

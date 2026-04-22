@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 
 type Message = { role: "user" | "assistant"; content: string };
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3001";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 const examplePrompts = [
   "What projects have you worked on?",
@@ -248,8 +248,7 @@ const AIAgentSection = () => {
                 <div className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
                   m.role === "user"
                     ? "bg-primary/15 border border-primary/20"
-                    : "bgcalling get_project_overview({'project_id': '31638fa102e780598dffd1cfa8bccab7'})
--muted/50 border border-border/50"
+                    : "bg-muted/50 border border-border/50"
                 }`}>
                   {m.content.split("\n").map((line, j) => (
                     <p key={j} className={j > 0 ? "mt-1" : ""}>
