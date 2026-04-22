@@ -13,32 +13,58 @@ const examplePrompts = [
   "Tell me about your experience with LLMs",
 ];
 
-const SESSION_STORAGE_KEY = "chat_session_id";
+const WELCOME: Message = {
+  role: "assistant",
+  content:
+    "Hey! 👋 I'm the digital version of Nitheesh. Ask me anything about my experience, skills, or projects!",
+};
 
-const mintSessionId = () => {
-  const id =
-    typeof crypto !== "undefined" && "randomUUID" in crypto
-      ? crypto.randomUUID()
-      : `sid-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-  sessionStorage.setItem(SESSION_STORAGE_KEY, id);
-  return id;
+// How much prior history to send to the backend on each request.
+// Large enough for multi-turn context, small enough to keep payload tight.
+const MAX_HISTORY_SENT = 20;
+
+// Storage key for the local chat transcript. Survives page refreshes within
+// a tab, dies on tab close (sessionStorage semantics).
+const HISTORY_STORAGE_KEY = "chat_history";
+
+const loadSavedMessages = (): Message[] => {
+  if (typeof window === "undefined") return [WELCOME];
+  try {
+    const raw = sessionStorage.getItem(HISTORY_STORAGE_KEY);
+    if (!raw) return [WELCOME];
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed) && parsed.length > 0) {
+      return parsed.filter(
+        (m) =>
+          m &&
+          (m.role === "user" || m.role === "assistant") &&
+          typeof m.content === "string",
+      );
+    }
+  } catch {
+    // ignore corrupt storage
+  }
+  return [WELCOME];
 };
 
 const AIAgentSection = () => {
   const ref = useRef(null);
   const inView = useInView(ref, { once: false, margin: "-100px" });
-  const [messages, setMessages] = useState<Message[]>([
-    { role: "assistant", content: "Hey! 👋 I'm the digital version of Nitheesh. Ask me anything about my experience, skills, or projects!" },
-  ]);
+  const [messages, setMessages] = useState<Message[]>(loadSavedMessages);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [typingStatus, setTypingStatus] = useState<string>("");
-  const [sessionId, setSessionId] = useState<string>(() => {
-    if (typeof window === "undefined") return "";
-    return sessionStorage.getItem(SESSION_STORAGE_KEY) || mintSessionId();
-  });
   const chatEndRef = useRef<HTMLDivElement>(null);
   const isFirstRender = useRef(true);
+
+  // Persist history in sessionStorage as it changes so a refresh keeps context.
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(messages));
+    } catch {
+      // storage quota or disabled — silently ignore
+    }
+  }, [messages]);
 
   useEffect(() => {
     if (isFirstRender.current) {
@@ -48,43 +74,27 @@ const AIAgentSection = () => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }, [messages]);
 
-  // Clean up session on tab close / navigate away.
-  useEffect(() => {
-    const handleUnload = () => {
-      const sid = sessionStorage.getItem(SESSION_STORAGE_KEY);
-      if (sid) {
-        navigator.sendBeacon(
-          `${API_URL}/api/session/delete`,
-          new Blob([JSON.stringify({ session_id: sid })], { type: "application/json" }),
-        );
-        sessionStorage.removeItem(SESSION_STORAGE_KEY);
-      }
-    };
-    window.addEventListener("beforeunload", handleUnload);
-    return () => window.removeEventListener("beforeunload", handleUnload);
-  }, []);
-
   const sendMessage = async (text: string) => {
     if (!text.trim() || isTyping) return;
     const userMsg: Message = { role: "user", content: text.trim() };
+
+    // Snapshot history BEFORE appending the new user message, skip the welcome
+    // (purely cosmetic — not real conversation context), and cap the length.
+    const historyForRequest = messages
+      .filter((m) => m !== WELCOME && m.content !== WELCOME.content)
+      .slice(-MAX_HISTORY_SENT);
+
     setMessages((prev) => [...prev, userMsg]);
     setInput("");
     setIsTyping(true);
     setTypingStatus("");
-
-    // Ensure a session exists (first render in SSR contexts, etc.).
-    let sid = sessionId;
-    if (!sid) {
-      sid = mintSessionId();
-      setSessionId(sid);
-    }
 
     try {
       const resp = await fetch(`${API_URL}/api/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          session_id: sid,
+          history: historyForRequest,
           message: text.trim(),
         }),
       });
@@ -146,7 +156,11 @@ const AIAgentSection = () => {
     } catch {
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: "Sorry, I'm having trouble connecting right now. Please try again later!" },
+        {
+          role: "assistant",
+          content:
+            "Sorry, I'm having trouble connecting right now. Please try again later!",
+        },
       ]);
       setIsTyping(false);
       setTypingStatus("");
@@ -154,18 +168,12 @@ const AIAgentSection = () => {
   };
 
   const clearChat = () => {
-    // Delete old session on backend (fire-and-forget).
-    if (sessionId) {
-      fetch(`${API_URL}/api/session/delete`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ session_id: sessionId }),
-      }).catch(() => {});
+    setMessages([WELCOME]);
+    try {
+      sessionStorage.removeItem(HISTORY_STORAGE_KEY);
+    } catch {
+      // ignore
     }
-    setMessages([
-      { role: "assistant", content: "Hey! 👋 I'm the digital version of Nitheesh. Ask me anything about my experience, skills, or projects!" },
-    ]);
-    setSessionId(mintSessionId());
   };
 
   return (

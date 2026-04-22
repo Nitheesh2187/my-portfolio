@@ -53,7 +53,6 @@ from config import (
     RETRY_BACKOFF_SECONDS,
     TEMPERATURE,
 )
-from store import sessions
 
 log = logging.getLogger(__name__)
 
@@ -149,15 +148,22 @@ async def _create_stream(messages: list[dict], use_tools: bool):
 # ---------------------------------------------------------------------------
 
 
-async def run(session_id: str, user_message: str) -> AsyncIterator[dict | str]:
+async def run(history: list[dict], user_message: str) -> AsyncIterator[dict | str]:
     """Run one chat turn.
 
+    Stateless — the caller (serverless handler) owns conversation history and
+    passes it on every invocation. Nothing is persisted here.
+
+    Args:
+        history: Prior messages in OpenAI format
+                 (list of {"role": "user"|"assistant", "content": str}).
+        user_message: The new user message for this turn.
+
     Yields:
-      {"status": "..."}    — progress label while a tool runs
-      {"content": "..."}   — a streamed token of the assistant's answer
-      "[DONE]"             — sentinel marking end of stream
+        {"status": "..."}    — progress label while a tool runs
+        {"content": "..."}   — a streamed token of the assistant's answer
+        "[DONE]"             — sentinel marking end of stream
     """
-    history = sessions.get_history(session_id)
     system_prompt = await prompts.build_system_prompt()
 
     messages: list[dict] = [
@@ -166,17 +172,9 @@ async def run(session_id: str, user_message: str) -> AsyncIterator[dict | str]:
         {"role": "user", "content": user_message},
     ]
 
-    collected_reply = ""
-
     try:
         async for event in _run_loop(messages):
-            if isinstance(event, dict) and "content" in event:
-                collected_reply += event["content"]
             yield event
-
-        if collected_reply.strip():
-            sessions.append_turn(session_id, user_message, collected_reply)
-
     except UserFacingError as e:
         yield {"content": e.user_message}
     except Exception:
