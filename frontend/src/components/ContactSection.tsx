@@ -20,22 +20,76 @@ const socialItem = {
   },
 };
 
+const WEB3FORMS_KEY = import.meta.env.VITE_WEB3FORMS_KEY ?? "";
+
 const ContactSection = () => {
   const ref = useRef(null);
   const inView = useInView(ref, { once: false, margin: "-100px" });
   const { toast } = useToast();
   const [form, setForm] = useState({ name: "", email: "", message: "" });
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast({ title: "Message sent!", description: "Thanks for reaching out. I'll get back to you soon." });
-    setForm({ name: "", email: "", message: "" });
+    if (submitting) return;
+    setSubmitting(true);
+
+    try {
+      // No key set → simulate a successful submission so we can test the UI
+      // without signing up. Logs the payload so you can verify what would be
+      // sent. Never use this path in production.
+      if (!WEB3FORMS_KEY) {
+        console.info("[ContactForm] DEV MODE — would submit:", form);
+        await new Promise((r) => setTimeout(r, 800));
+        toast({
+          title: "Message sent! (dev mode)",
+          description:
+            "VITE_WEB3FORMS_KEY isn't set, so this was a fake submission. Check the console.",
+        });
+        setForm({ name: "", email: "", message: "" });
+        return;
+      }
+
+      const resp = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({
+          access_key: WEB3FORMS_KEY,
+          name: form.name,
+          email: form.email,
+          message: form.message,
+          subject: `Portfolio contact from ${form.name}`,
+          from_name: "Portfolio Contact Form",
+          botcheck: "",  // honeypot — leave empty for humans
+        }),
+      });
+
+      const data = await resp.json().catch(() => ({}));
+      if (!resp.ok || data.success === false) {
+        throw new Error(data.message || "Web3Forms rejected the submission");
+      }
+
+      toast({
+        title: "Message sent!",
+        description: "Thanks for reaching out. I'll get back to you soon.",
+      });
+      setForm({ name: "", email: "", message: "" });
+    } catch (err) {
+      toast({
+        title: "Couldn't send",
+        description:
+          "Something went wrong. Please try again, or email me directly.",
+        variant: "destructive",
+      });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const socials = [
-    { icon: <Mail size={20} />, label: "Email", href: "mailto:example@email.com", text: "example@email.com" },
-    { icon: <Linkedin size={20} />, label: "LinkedIn", href: "https://linkedin.com/in/example", text: "linkedin.com/in/example" },
-    { icon: <Github size={20} />, label: "GitHub", href: "https://github.com/example", text: "github.com/example" },
+    { icon: <Mail size={20} />, label: "Email", text: "bopparajunitheesh7@email.com" },
+    { icon: <Linkedin size={20} />, label: "LinkedIn", href: "https://www.linkedin.com/in/nitheesh22/", text: "linkedin.com/in/nitheesh22" },
+    { icon: <Github size={20} />, label: "GitHub", href: "https://github.com/Nitheesh2187", text: "github.com/Nitheesh2187" },
   ];
 
   return (
@@ -102,8 +156,12 @@ const ContactSection = () => {
               animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
               transition={{ delay: 0.7 }}
             >
-              <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl gap-2">
-                <Send size={16} /> Send Message
+              <Button
+                type="submit"
+                disabled={submitting}
+                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl gap-2 disabled:opacity-60"
+              >
+                <Send size={16} /> {submitting ? "Sending…" : "Send Message"}
               </Button>
             </motion.div>
           </motion.form>

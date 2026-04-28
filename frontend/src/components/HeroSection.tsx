@@ -6,10 +6,10 @@ import profilePhoto from "@/assets/profile-photo.png";
 
 const roles = [
   "Machine Learning Engineer",
-  "YouTuber",
-  "AI Systems Builder",
-  "Full-Stack Developer",
-  "Open Source Contributor",
+  // "YouTuber",
+  // "AI Systems Builder",
+  // "Full-Stack Developer",
+  // "Open Source Contributor",
 ];
 
 const useRollingTypewriter = (items: string[], initialDelay: number, typeSpeed = 70, pauseMs = 2000, deleteSpeed = 40) => {

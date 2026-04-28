@@ -9,11 +9,24 @@ import AIAgentSection from "@/components/AIAgentSection";
 import ContactSection from "@/components/ContactSection";
 import Footer from "@/components/Footer";
 import ParticleBackground from "@/components/ParticleBackground";
+import { useActiveSection } from "@/hooks/use-active-section";
+
+const SECTION_IDS = [
+  "home",
+  "about",
+  "experience",
+  "skills",
+  "projects",
+  "ai-agent",
+  "contact",
+];
 
 const Index = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  useActiveSection(SECTION_IDS);
 
   return (
   <div className="relative min-h-screen bg-background neural-bg">

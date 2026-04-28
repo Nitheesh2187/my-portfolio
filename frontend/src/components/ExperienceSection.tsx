@@ -10,7 +10,7 @@ const experiences = [
     items: [
       "Built multimodal AI pipelines across vision, NLP, and audio domains",
       "Optimized inference with Triton + TensorRT: 120+ inferences/sec, <50ms latency",
-      "Deployed vLLM for Mixtral-8x7B with long context support (12k–16k tokens)",
+      "Deployed Mixtral-8x7B using vLLM with long context support (12k–16k tokens)",
       "Engineered Whisper-based transcription pipelines for production use",
     ],
     metrics: ["120+ inf/sec", "<50ms latency", "16k context"],

@@ -2,8 +2,19 @@ import { useRef, useState, useCallback, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ExternalLink, Github, MessageSquare, TrendingUp, Newspaper, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
-const projects = [
+type Project = {
+  title: string;
+  description: string;
+  tech: string[];
+  features: { icon: React.ReactNode; text: string }[];
+  github?: string;
+  liveDemo?: string;
+  hoverText?: string;  // optional tooltip shown when hovering the Live Demo button
+};
+
+const projects: Project[] = [
   {
     title: "Stock Assistance Agent",
     description: "AI-powered stock assistant providing real-time market data, fundamental analysis, and news aggregation through a streaming chat interface.",
@@ -14,6 +25,9 @@ const projects = [
       { icon: <Newspaper size={14} />, text: "Market news + scraping" },
       { icon: <MessageSquare size={14} />, text: "Streaming chat interface" },
     ],
+    github: "https://github.com/Nitheesh2187/Stock-Assistant-Agent",     // ← replace
+    liveDemo: "https://stock-assistant-agent.onrender.com/",             // ← replace, or omit
+    hoverText: "Hosted on Render's free tier — first load can take some time while the service spins up."
   },
 ];
 
@@ -168,12 +182,45 @@ const ProjectsSection = () => {
                   </div>
 
                   <div className="flex gap-3">
-                    <Button variant="outline" size="sm" className="gap-2 rounded-xl border-border hover:bg-muted">
-                      <ExternalLink size={14} /> Live Demo
-                    </Button>
-                    <Button variant="outline" size="sm" className="gap-2 rounded-xl border-border hover:bg-muted">
-                      <Github size={14} /> GitHub
-                    </Button>
+                    {p.liveDemo && (() => {
+                      const liveDemoButton = (
+                        <Button
+                          asChild
+                          variant="outline"
+                          size="sm"
+                          className="gap-2 rounded-xl border-border hover:bg-muted"
+                        >
+                          <a href={p.liveDemo} target="_blank" rel="noreferrer">
+                            <ExternalLink size={14} /> Live Demo
+                          </a>
+                        </Button>
+                      );
+                      // Only wrap with a Tooltip when this project has a hoverText.
+                      return p.hoverText ? (
+                        <TooltipProvider delayDuration={200}>
+                          <Tooltip>
+                            <TooltipTrigger asChild>{liveDemoButton}</TooltipTrigger>
+                            <TooltipContent side="top" className="max-w-xs">
+                              {p.hoverText}
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      ) : (
+                        liveDemoButton
+                      );
+                    })()}
+                    {p.github && (
+                      <Button
+                        asChild
+                        variant="outline"
+                        size="sm"
+                        className="gap-2 rounded-xl border-border hover:bg-muted"
+                      >
+                        <a href={p.github} target="_blank" rel="noreferrer">
+                          <Github size={14} /> GitHub
+                        </a>
+                      </Button>
+                    )}
                   </div>
                 </div>
               </div>
