@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, useInView } from "framer-motion";
 import { Bot, Send, User, Sparkles, Trash2 } from "lucide-react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { Button } from "@/components/ui/button";
 
 type Message = { role: "user" | "assistant"; content: string };
@@ -250,13 +252,56 @@ const AIAgentSection = () => {
                     ? "bg-primary/15 border border-primary/20"
                     : "bg-muted/50 border border-border/50"
                 }`}>
-                  {m.content.split("\n").map((line, j) => (
-                    <p key={j} className={j > 0 ? "mt-1" : ""}>
-                      {line.split("**").map((part, k) =>
-                        k % 2 === 1 ? <strong key={k} className="text-foreground">{part}</strong> : part
-                      )}
-                    </p>
-                  ))}
+                  <ReactMarkdown
+                    remarkPlugins={[remarkGfm]}
+                    components={{
+                      p: ({ children }) => <p className="leading-relaxed mb-1 last:mb-0">{children}</p>,
+                      strong: ({ children }) => <strong className="text-foreground font-semibold">{children}</strong>,
+                      em: ({ children }) => <em className="italic">{children}</em>,
+                      a: ({ href, children }) => (
+                        <a href={href} target="_blank" rel="noreferrer" className="text-accent underline hover:opacity-80">
+                          {children}
+                        </a>
+                      ),
+                      ul: ({ children }) => <ul className="list-disc list-inside my-1 space-y-0.5">{children}</ul>,
+                      ol: ({ children }) => <ol className="list-decimal list-inside my-1 space-y-0.5">{children}</ol>,
+                      li: ({ children }) => <li className="leading-relaxed">{children}</li>,
+                      h1: ({ children }) => <h1 className="text-base font-bold mt-2 mb-1">{children}</h1>,
+                      h2: ({ children }) => <h2 className="text-sm font-bold mt-2 mb-1">{children}</h2>,
+                      h3: ({ children }) => <h3 className="text-sm font-semibold mt-1 mb-0.5">{children}</h3>,
+                      code: ({ children, className }) => {
+                        const isBlock = className?.includes("language-");
+                        if (isBlock) {
+                          return (
+                            <pre className="bg-muted/60 border border-border/50 rounded-md p-2 my-2 overflow-x-auto">
+                              <code className="text-xs">{children}</code>
+                            </pre>
+                          );
+                        }
+                        return <code className="bg-muted/60 px-1 py-0.5 rounded text-xs">{children}</code>;
+                      },
+                      blockquote: ({ children }) => (
+                        <blockquote className="border-l-2 border-accent/50 pl-3 my-2 italic text-muted-foreground">
+                          {children}
+                        </blockquote>
+                      ),
+                      table: ({ children }) => (
+                        <div className="overflow-x-auto my-2">
+                          <table className="text-xs border-collapse w-full">{children}</table>
+                        </div>
+                      ),
+                      thead: ({ children }) => <thead className="bg-muted/40">{children}</thead>,
+                      th: ({ children }) => (
+                        <th className="border border-border/50 px-2 py-1 text-left font-semibold">{children}</th>
+                      ),
+                      td: ({ children }) => (
+                        <td className="border border-border/50 px-2 py-1 align-top">{children}</td>
+                      ),
+                      hr: () => <hr className="my-2 border-border/50" />,
+                    }}
+                  >
+                    {m.content}
+                  </ReactMarkdown>
                 </div>
               </div>
             ))}
