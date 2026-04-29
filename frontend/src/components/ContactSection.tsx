@@ -95,7 +95,7 @@ const ContactSection = () => {
   return (
     <section
       id="contact"
-      className="py-8 md:py-28 px-4 md:px-8 flex-1 flex flex-col justify-center"
+      className="pt-[10vh] pb-8 md:py-28 px-4 md:px-8 flex-1 flex flex-col justify-center"
       ref={ref}
     >
       <div className="container mx-auto max-w-4xl px-4">

@@ -185,7 +185,7 @@ const AIAgentSection = () => {
   return (
     <section
       id="ai-agent"
-      className="pt-[10vh] pb-6 md:py-28 px-4 md:px-8 min-h-screen-nav flex flex-col justify-start md:justify-center"
+      className="pt-[10vh] pb-12 md:py-28 px-4 md:px-8 min-h-screen-nav flex flex-col justify-start md:justify-center"
       ref={ref}
     >
       <div className="container mx-auto max-w-3xl px-3 sm:px-4">
