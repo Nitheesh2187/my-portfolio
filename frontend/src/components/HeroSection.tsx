@@ -104,10 +104,10 @@ const HeroSection = () => {
 
   return (
     <section id="home" ref={ref} className="relative min-h-screen flex items-center overflow-hidden">
-      <div className="container mx-auto relative z-10 pt-24 pb-12">
-        <div className="grid md:grid-cols-2 gap-12 items-center">
+      <div className="container mx-auto relative z-10 pt-20 md:pt-24 pb-8 md:pb-12 px-4">
+        <div className="grid md:grid-cols-2 gap-6 md:gap-12 items-center">
           {/* Left */}
-          <div className="space-y-6">
+          <div className="space-y-4 md:space-y-6 order-2 md:order-1 text-center md:text-left">
             {/* Heading */}
             <div className="font-display font-bold leading-tight">
               <motion.p
@@ -132,7 +132,7 @@ const HeroSection = () => {
                 initial={{ width: 0 }}
                 animate={inView ? { width: "8rem" } : { width: 0 }}
                 transition={{ delay: 0.8, duration: 0.6, ease: "easeOut" }}
-                className="h-1 bg-gradient-to-r from-primary via-accent to-secondary rounded-full mt-2 mb-2"
+                className="h-1 bg-gradient-to-r from-primary via-accent to-secondary rounded-full mt-2 mb-2 mx-auto md:mx-0"
               />
 
               <motion.p
@@ -153,7 +153,7 @@ const HeroSection = () => {
               initial={{ opacity: 0, filter: "blur(8px)" }}
               animate={inView ? { opacity: 1, filter: "blur(0px)" } : { opacity: 0, filter: "blur(8px)" }}
               transition={{ delay: 0.9, duration: 0.8 }}
-              className="text-lg text-muted-foreground max-w-lg leading-relaxed"
+              className="text-base md:text-lg text-muted-foreground max-w-lg leading-relaxed mx-auto md:mx-0"
             >
               Building production-ready AI systems at scale.
             </motion.p>
@@ -162,33 +162,65 @@ const HeroSection = () => {
               initial={{ opacity: 0, filter: "blur(8px)" }}
               animate={inView ? { opacity: 1, filter: "blur(0px)" } : { opacity: 0, filter: "blur(8px)" }}
               transition={{ delay: 1.0, duration: 0.8 }}
-              className="text-muted-foreground max-w-lg leading-relaxed"
+              className="hidden md:block text-muted-foreground max-w-lg leading-relaxed"
             >
               Specializing in scalable AI systems, model serving, and inference optimization.
               Passionate about building and deploying intelligent systems across vision, language,
               and audio domains, with a focus on LLMs, RAG pipelines, and agentic AI.
             </motion.p>
 
-            {/* Buttons */}
+            {/* Buttons — stay on one line on mobile with shorter labels */}
             <motion.div
               variants={buttonContainer}
               initial="hidden"
               animate={inView ? "show" : "hidden"}
-              className="flex flex-wrap gap-3"
+              className="flex flex-nowrap justify-center md:justify-start gap-2 md:gap-3"
             >
               <motion.div variants={buttonItem} whileHover={{ scale: 1.05, y: -2 }} whileTap={{ scale: 0.97 }}>
-                <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl gap-2">
-                  <a href="https://drive.google.com/file/d/13Ftl-ngWkqfk3wAeWbIL4NeUX8ssMHPh/view?usp=drive_link" target="_blank" rel="noopener noreferrer"><FileText size={18} /> View Resume</a>
+                <Button
+                  asChild
+                  size="sm"
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl gap-1.5 px-3 md:px-4 md:h-10 md:text-base"
+                >
+                  <a
+                    href="https://drive.google.com/file/d/13Ftl-ngWkqfk3wAeWbIL4NeUX8ssMHPh/view?usp=drive_link"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <FileText size={14} className="md:hidden" />
+                    <FileText size={18} className="hidden md:inline" />
+                    <span className="md:hidden">Resume</span>
+                    <span className="hidden md:inline">View Resume</span>
+                  </a>
                 </Button>
               </motion.div>
               <motion.div variants={buttonItem} whileHover={{ scale: 1.05, y: -2 }} whileTap={{ scale: 0.97 }}>
-                <Button asChild variant="outline" size="lg" className="rounded-xl gap-2 border-border hover:bg-muted">
-                  <a href="#contact"><Mail size={18} /> Contact Me</a>
+                <Button
+                  asChild
+                  variant="outline"
+                  size="sm"
+                  className="rounded-xl gap-1.5 px-3 md:px-4 md:h-10 md:text-base border-border hover:bg-muted"
+                >
+                  <a href="#contact">
+                    <Mail size={14} className="md:hidden" />
+                    <Mail size={18} className="hidden md:inline" />
+                    <span className="md:hidden">Contact</span>
+                    <span className="hidden md:inline">Contact Me</span>
+                  </a>
                 </Button>
               </motion.div>
               <motion.div variants={buttonItem} whileHover={{ scale: 1.05, y: -2 }} whileTap={{ scale: 0.97 }}>
-                <Button asChild size="lg" className="bg-secondary hover:bg-secondary/90 text-secondary-foreground rounded-xl gap-2">
-                  <a href="#ai-agent"><Bot size={18} /> Try My AI Agent</a>
+                <Button
+                  asChild
+                  size="sm"
+                  className="bg-secondary hover:bg-secondary/90 text-secondary-foreground rounded-xl gap-1.5 px-3 md:px-4 md:h-10 md:text-base"
+                >
+                  <a href="#ai-agent">
+                    <Bot size={14} className="md:hidden" />
+                    <Bot size={18} className="hidden md:inline" />
+                    <span className="md:hidden">AI Agent</span>
+                    <span className="hidden md:inline">Try My AI Agent</span>
+                  </a>
                 </Button>
               </motion.div>
             </motion.div>
@@ -198,7 +230,7 @@ const HeroSection = () => {
               variants={staggerContainer}
               initial="hidden"
               animate={inView ? "show" : "hidden"}
-              className="flex flex-wrap gap-3 pt-4"
+              className="flex flex-wrap justify-center md:justify-start gap-2 md:gap-3 pt-2 md:pt-4"
             >
               {highlights.map((h) => (
                 <motion.span
@@ -213,8 +245,8 @@ const HeroSection = () => {
             </motion.div>
           </div>
 
-          {/* Right — profile */}
-          <div className="flex justify-center">
+          {/* Right — profile (shown on top on mobile, on the right on desktop) */}
+          <div className="flex justify-center order-1 md:order-2">
             <motion.img
               src={profilePhoto}
               alt="Nitheesh Bopparaju"
@@ -227,7 +259,7 @@ const HeroSection = () => {
               }
               transition={{ delay: 0.5, duration: 0.8, type: "spring", stiffness: 80 }}
               whileHover={{ scale: 1.05, transition: { duration: 0.3 } }}
-              className="w-64 md:w-80 object-contain"
+              className="w-40 sm:w-56 md:w-80 object-contain"
             />
           </div>
         </div>
@@ -237,7 +269,7 @@ const HeroSection = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ delay: 1.4, duration: 0.6 }}
-          className="mt-16 overflow-hidden relative"
+          className="mt-8 md:mt-16 overflow-hidden relative"
         >
           <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-background to-transparent z-10" />
           <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-background to-transparent z-10" />

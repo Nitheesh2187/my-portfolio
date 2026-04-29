@@ -87,41 +87,45 @@ const ContactSection = () => {
   };
 
   const socials = [
-    { icon: <Mail size={20} />, label: "Email", text: "bopparajunitheesh7@email.com" },
-    { icon: <Linkedin size={20} />, label: "LinkedIn", href: "https://www.linkedin.com/in/nitheesh22/", text: "linkedin.com/in/nitheesh22" },
-    { icon: <Github size={20} />, label: "GitHub", href: "https://github.com/Nitheesh2187", text: "github.com/Nitheesh2187" },
+    { icon: <Mail size={18} />, label: "Email", text: "bopparajunitheesh7@email.com" },
+    { icon: <Linkedin size={18} />, label: "LinkedIn", href: "https://www.linkedin.com/in/nitheesh22/", text: "linkedin.com/in/nitheesh22" },
+    { icon: <Github size={18} />, label: "GitHub", href: "https://github.com/Nitheesh2187", text: "github.com/Nitheesh2187" },
   ];
 
   return (
-    <section id="contact" className="section-padding" ref={ref}>
-      <div className="container mx-auto max-w-4xl">
-        {/* Heading */}
-        <div className="mb-12 overflow-hidden">
+    <section
+      id="contact"
+      className="py-8 md:py-28 px-4 md:px-8 flex-1 flex flex-col justify-center"
+      ref={ref}
+    >
+      <div className="container mx-auto max-w-4xl px-4">
+        {/* Heading — centered on mobile, left on desktop */}
+        <div className="mb-3 md:mb-12 overflow-hidden text-center md:text-left">
           <motion.div
             initial={{ x: -100, opacity: 0 }}
             animate={inView ? { x: 0, opacity: 1 } : { x: -100, opacity: 0 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
           >
-            <h2 className="font-display text-3xl md:text-5xl font-bold mb-4">
+            <h2 className="font-display text-2xl md:text-5xl font-bold mb-2 md:mb-4">
               Get In <span className="text-gradient">Touch</span>
             </h2>
             <motion.div
               initial={{ width: 0 }}
               animate={inView ? { width: "6rem" } : { width: 0 }}
               transition={{ delay: 0.4, duration: 0.5 }}
-              className="h-1 bg-gradient-to-r from-primary to-accent rounded-full"
+              className="h-1 bg-gradient-to-r from-primary to-accent rounded-full mx-auto md:mx-0"
             />
           </motion.div>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8">
+        <div className="grid md:grid-cols-2 gap-4 md:gap-8">
           {/* Form — slides in from left */}
           <motion.form
             initial={{ opacity: 0, x: -60, rotateY: 10 }}
             animate={inView ? { opacity: 1, x: 0, rotateY: 0 } : { opacity: 0, x: -60, rotateY: 10 }}
             transition={{ delay: 0.2, type: "spring", stiffness: 80, damping: 15 }}
             onSubmit={handleSubmit}
-            className="glass-card p-6 space-y-4"
+            className="glass-card p-3 md:p-6 space-y-2 md:space-y-4"
             style={{ perspective: 800 }}
           >
             {(["name", "email", "message"] as const).map((field, i) => (
@@ -131,14 +135,14 @@ const ContactSection = () => {
                 animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
                 transition={{ delay: 0.4 + i * 0.1 }}
               >
-                <label className="text-sm text-muted-foreground capitalize mb-1 block">{field}</label>
+                <label className="text-xs md:text-sm text-muted-foreground capitalize mb-0.5 md:mb-1 block">{field}</label>
                 {field === "message" ? (
                   <textarea
                     value={form[field]}
                     onChange={(e) => setForm({ ...form, [field]: e.target.value })}
-                    rows={4}
+                    rows={2}
                     required
-                    className="w-full bg-muted/30 border border-border/50 rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/50 resize-none transition-shadow focus:shadow-[0_0_15px_hsla(0,72%,51%,0.15)]"
+                    className="w-full bg-muted/30 border border-border/50 rounded-xl px-3 py-1.5 md:px-4 md:py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/50 resize-none transition-shadow focus:shadow-[0_0_15px_hsla(0,72%,51%,0.15)] min-h-[50px] md:min-h-[110px]"
                   />
                 ) : (
                   <input
@@ -146,7 +150,7 @@ const ContactSection = () => {
                     value={form[field]}
                     onChange={(e) => setForm({ ...form, [field]: e.target.value })}
                     required
-                    className="w-full bg-muted/30 border border-border/50 rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/50 transition-shadow focus:shadow-[0_0_15px_hsla(0,72%,51%,0.15)]"
+                    className="w-full bg-muted/30 border border-border/50 rounded-xl px-3 py-1.5 md:px-4 md:py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/50 transition-shadow focus:shadow-[0_0_15px_hsla(0,72%,51%,0.15)]"
                   />
                 )}
               </motion.div>
@@ -159,20 +163,21 @@ const ContactSection = () => {
               <Button
                 type="submit"
                 disabled={submitting}
-                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl gap-2 disabled:opacity-60"
+                size="sm"
+                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl gap-2 disabled:opacity-60 md:h-10 md:text-base"
               >
-                <Send size={16} /> {submitting ? "Sending…" : "Send Message"}
+                <Send size={14} /> {submitting ? "Sending…" : "Send Message"}
               </Button>
             </motion.div>
           </motion.form>
 
           {/* Social links — staggered from right */}
-          <div className="space-y-4">
+          <div className="space-y-3 md:space-y-4">
             <motion.p
               initial={{ opacity: 0 }}
               animate={inView ? { opacity: 1 } : { opacity: 0 }}
               transition={{ delay: 0.3 }}
-              className="text-muted-foreground mb-6"
+              className="hidden md:block text-muted-foreground mb-6"
             >
               I'm always open to discussing new projects, collaborations, or opportunities in AI/ML engineering.
             </motion.p>
@@ -180,7 +185,7 @@ const ContactSection = () => {
               variants={socialVariants}
               initial="hidden"
               animate={inView ? "show" : "hidden"}
-              className="space-y-4"
+              className="space-y-2.5 md:space-y-4"
             >
               {socials.map((s) => (
                 <motion.a
@@ -195,17 +200,17 @@ const ContactSection = () => {
                   href={s.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="glass-card p-4 flex items-center gap-4 group block"
+                  className="glass-card p-2.5 md:p-4 flex items-center gap-3 md:gap-4 group block"
                 >
                   <motion.div
                     whileHover={{ rotate: 15, scale: 1.2 }}
-                    className="text-accent group-hover:text-primary transition-colors"
+                    className="text-accent group-hover:text-primary transition-colors shrink-0"
                   >
                     {s.icon}
                   </motion.div>
-                  <div>
+                  <div className="min-w-0">
                     <p className="font-display font-semibold text-sm">{s.label}</p>
-                    <p className="text-muted-foreground text-xs">{s.text}</p>
+                    <p className="text-muted-foreground text-xs truncate">{s.text}</p>
                   </div>
                 </motion.a>
               ))}

@@ -124,6 +124,10 @@
   .animate-blink {
     animation: blink 1s step-end infinite;
   }
+
+  /* Hide native scrollbar on horizontal swipe carousels (mobile). */
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+  .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 }
 
 @keyframes blink {

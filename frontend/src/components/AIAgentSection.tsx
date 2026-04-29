@@ -183,8 +183,8 @@ const AIAgentSection = () => {
   };
 
   return (
-    <section id="ai-agent" className="section-padding" ref={ref}>
-      <div className="container mx-auto max-w-3xl">
+    <section id="ai-agent" className="section-padding min-h-screen flex flex-col justify-center" ref={ref}>
+      <div className="container mx-auto max-w-3xl px-3 sm:px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
@@ -239,7 +239,7 @@ const AIAgentSection = () => {
           </div>
 
           {/* Messages */}
-          <div className="h-80 overflow-y-auto p-6 space-y-4">
+          <div className="h-72 sm:h-80 overflow-y-auto p-4 sm:p-6 space-y-3 sm:space-y-4">
             {messages.map((m, i) => (
               <div key={i} className={`flex gap-3 ${m.role === "user" ? "flex-row-reverse" : ""}`}>
                 <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${
@@ -328,7 +328,7 @@ const AIAgentSection = () => {
           </div>
 
           {/* Example prompts */}
-          <div className="px-6 pb-3 flex flex-wrap gap-2">
+          <div className="px-4 sm:px-6 pb-3 flex flex-wrap gap-2">
             {examplePrompts.map((p) => (
               <button
                 key={p}
@@ -341,7 +341,7 @@ const AIAgentSection = () => {
           </div>
 
           {/* Input */}
-          <div className="px-6 pb-6">
+          <div className="px-4 sm:px-6 pb-4 sm:pb-6">
             <form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -353,10 +353,16 @@ const AIAgentSection = () => {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Ask me anything..."
-                className="flex-1 bg-muted/30 border border-border/50 rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/50"
+                className="flex-1 min-w-0 bg-muted/30 border border-border/50 rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/50"
               />
-              <Button type="submit" size="icon" className="rounded-xl bg-primary hover:bg-primary/90 h-11 w-11">
-                <Send size={16} />
+              <Button
+                type="submit"
+                size="icon"
+                aria-label="Send message"
+                className="shrink-0 rounded-xl bg-primary hover:bg-primary/90 h-12 w-12 sm:h-11 sm:w-11"
+              >
+                <Send size={20} className="sm:hidden" />
+                <Send size={16} className="hidden sm:block" />
               </Button>
             </form>
           </div>

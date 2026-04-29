@@ -31,7 +31,11 @@ const Navbar = () => {
         scrolled ? "glass-card rounded-none border-x-0 border-t-0" : "bg-transparent"
       }`}
     >
-      <div className="container mx-auto flex items-center justify-between py-4">
+      <div className="container mx-auto flex items-center justify-between py-4 px-4">
+        {/* Invisible spacer (mobile only) — same width as the menu button on
+            the right, so justify-between centers the brand between them. */}
+        <div className="md:hidden w-6" aria-hidden />
+
         <a href="#home" className="font-display text-xl font-bold text-gradient">
           Nitheesh.ai
         </a>
@@ -52,6 +56,7 @@ const Navbar = () => {
         {/* Mobile toggle */}
         <button
           className="md:hidden text-foreground"
+          aria-label={mobileOpen ? "Close menu" : "Open menu"}
           onClick={() => setMobileOpen(!mobileOpen)}
         >
           {mobileOpen ? <X size={24} /> : <Menu size={24} />}
