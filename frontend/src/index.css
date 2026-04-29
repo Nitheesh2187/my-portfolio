@@ -130,6 +130,24 @@
   .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 
   /*
+    Horizontal carousel touch behaviour:
+    - touch-action: pan-x   → element only handles horizontal touches,
+                              vertical drags pass through to page scroll
+    - overscroll-behavior-x: contain → don't chain horizontal scroll past edges
+    Apply to elements that scroll horizontally with snap-x snap-mandatory.
+  */
+  .swipe-x {
+    touch-action: pan-x;
+    overscroll-behavior-x: contain;
+  }
+
+  /* Vertical inner scrollers (chat panels): prevent scroll chaining
+     into the page when user reaches the top/bottom of the inner area. */
+  .scroll-contain-y {
+    overscroll-behavior-y: contain;
+  }
+
+  /*
     Section height that accounts for the fixed navbar (5rem tall).
     Use INSTEAD of `min-h-screen` on full-viewport sections so that
     `flex justify-center` centres content within the *visible* area
@@ -137,8 +155,14 @@
     Pairs with `scroll-margin-top: 5rem` on section[id].
   */
   .min-h-screen-nav {
-    min-height: calc(100vh - 5rem);
-    min-height: calc(100dvh - 5rem); /* dynamic viewport on mobile */
+    /*
+      Stable height under the navbar.
+      `svh` = small viewport height (browser chrome at its largest, stays
+      constant as you scroll). Using svh avoids the page “jumping” on iOS /
+      Chrome mobile when the URL bar hides and `dvh` would grow mid-scroll.
+    */
+    min-height: calc(100vh - 5rem);          /* fallback */
+    min-height: calc(100svh - 5rem);
   }
 }
 
