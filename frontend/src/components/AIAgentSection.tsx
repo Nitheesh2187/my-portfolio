@@ -183,31 +183,35 @@ const AIAgentSection = () => {
   };
 
   return (
-    <section id="ai-agent" className="section-padding min-h-screen flex flex-col justify-center" ref={ref}>
+    <section
+      id="ai-agent"
+      className="pt-[10vh] pb-6 md:py-28 px-4 md:px-8 min-h-screen-nav flex flex-col justify-start md:justify-center"
+      ref={ref}
+    >
       <div className="container mx-auto max-w-3xl px-3 sm:px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-          className="text-center mb-8"
+          className="text-center mb-4 md:mb-8"
         >
           <motion.div
             initial={{ scale: 0, rotate: -10 }}
             animate={inView ? { scale: 1, rotate: 0 } : { scale: 0, rotate: -10 }}
             transition={{ type: "spring", stiffness: 200, damping: 15 }}
-            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-secondary/40 bg-secondary/10 text-secondary text-sm font-medium mb-4"
+            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-secondary/40 bg-secondary/10 text-secondary text-sm font-medium mb-2 md:mb-4"
           >
             <Sparkles size={14} /> Featured
           </motion.div>
-          <h2 className="font-display text-3xl md:text-5xl font-bold mb-4">
+          <h2 className="font-display text-2xl md:text-5xl font-bold mb-2 md:mb-4">
             Ask My <span className="text-gradient">AI Agent</span>
           </h2>
           <motion.div
             initial={{ width: 0 }}
             animate={inView ? { width: "6rem" } : { width: 0 }}
             transition={{ delay: 0.4, duration: 0.5 }}
-            className="h-1 bg-gradient-to-r from-primary to-accent rounded-full mx-auto mb-4"
+            className="h-1 bg-gradient-to-r from-primary to-accent rounded-full mx-auto mb-2 md:mb-4"
           />
-          <p className="text-muted-foreground">Chat with the digital me to learn about my experience and skills.</p>
+          <p className="hidden md:block text-muted-foreground">Chat with the digital me to learn about my experience and skills.</p>
         </motion.div>
 
         <motion.div

@@ -42,7 +42,7 @@ const Index = () => {
       {/* Contact + Footer share a single viewport. min-h-[100dvh] uses the
           dynamic viewport (accounts for mobile browser chrome) so the
           copyright line is visible without needing to scroll past the form. */}
-      <div className="min-h-[100dvh] flex flex-col">
+      <div className="min-h-screen-nav flex flex-col">
         <ContactSection />
         <Footer />
       </div>

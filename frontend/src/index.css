@@ -128,6 +128,18 @@
   /* Hide native scrollbar on horizontal swipe carousels (mobile). */
   .scrollbar-hide::-webkit-scrollbar { display: none; }
   .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+  /*
+    Section height that accounts for the fixed navbar (5rem tall).
+    Use INSTEAD of `min-h-screen` on full-viewport sections so that
+    `flex justify-center` centres content within the *visible* area
+    (below the navbar) rather than within the full viewport.
+    Pairs with `scroll-margin-top: 5rem` on section[id].
+  */
+  .min-h-screen-nav {
+    min-height: calc(100vh - 5rem);
+    min-height: calc(100dvh - 5rem); /* dynamic viewport on mobile */
+  }
 }
 
 @keyframes blink {

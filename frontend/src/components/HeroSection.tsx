@@ -103,7 +103,7 @@ const HeroSection = () => {
   const inView = useInView(ref, vp);
 
   return (
-    <section id="home" ref={ref} className="relative min-h-screen flex items-center overflow-hidden">
+    <section id="home" ref={ref} className="relative min-h-screen-nav flex items-center overflow-hidden">
       <div className="container mx-auto relative z-10 pt-20 md:pt-24 pb-8 md:pb-12 px-4">
         <div className="grid md:grid-cols-2 gap-6 md:gap-12 items-center">
           {/* Left */}

@@ -115,7 +115,11 @@ const SkillsSection = () => {
   };
 
   return (
-    <section id="skills" className="section-padding min-h-screen flex flex-col justify-center" ref={ref}>
+    <section
+      id="skills"
+      ref={ref}
+      className="pt-[10vh] pb-6 md:py-28 px-4 md:px-8 min-h-screen-nav flex flex-col justify-start md:justify-center"
+    >
       <div className="container mx-auto max-w-5xl px-4">
         {/* Heading — centered on mobile, left on desktop */}
         <div className="mb-8 md:mb-12 overflow-hidden text-center md:text-left">

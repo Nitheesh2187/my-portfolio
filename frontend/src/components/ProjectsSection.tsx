@@ -165,7 +165,7 @@ const ProjectsSection = () => {
     <section
       id="projects"
       ref={sectionRef}
-      className="section-padding min-h-screen flex flex-col justify-center"
+      className="pt-[10vh] pb-6 md:py-28 px-4 md:px-8 min-h-screen-nav flex flex-col justify-start md:justify-center"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
