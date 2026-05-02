@@ -1,6 +1,6 @@
 import { useRef, useState, useCallback, useEffect } from "react";
 import { motion } from "framer-motion";
-import { ExternalLink, Github, MessageSquare, TrendingUp, Newspaper, BarChart3 } from "lucide-react";
+import { ExternalLink, Github, MessageSquare, TrendingUp, Newspaper, BarChart3, Mic, Captions, Sparkles, FileText, Volume2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -30,6 +30,22 @@ const projects: Project[] = [
     liveDemo: "https://stock-assistant-agent.onrender.com/",
     hoverText: "Hosted on Render's free tier — first load can take some time while the service spins up.",
   },
+  {
+    title: "The Interviewer",
+    description: "Mock Interview agent which helps the user to practice interviews which mimic the real interview experience.",
+    tech: ["FastAPI", "React", "STT", "TTS", "WebSockets", "MCP"],
+    features: [
+      { icon: <Mic size={14} />, text: "Real-time voice conversation" },
+      { icon: <Captions size={14} />, text: "Live speech-to-text transcription" },
+      { icon: <FileText size={14} />, text: "Resume-aware questions" },                                                                                                                           
+      { icon: <Sparkles size={14} />, text: "Adaptive AI interviewer" },                                                                                                                          
+      { icon: <BarChart3 size={14} />, text: "Structured feedback & scoring" },                                                                                                                   
+      { icon: <Volume2 size={14} />, text: "Streaming voice responses" }, 
+    ],
+    github: "https://github.com/Nitheesh2187/The-Interviewer",
+    // liveDemo: "https://stock-assistant-agent.onrender.com/",
+    // hoverText: "Hosted on Render's free tier — first load can take some time while the service spins up.",
+  }
 ];
 
 const ProjectCard = ({ p }: { p: Project }) => {

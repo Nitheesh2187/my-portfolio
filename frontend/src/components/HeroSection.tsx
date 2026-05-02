@@ -183,7 +183,7 @@ const HeroSection = () => {
                   className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl gap-1.5 px-3 md:px-4 md:h-10 md:text-base"
                 >
                   <a
-                    href="https://drive.google.com/file/d/13Ftl-ngWkqfk3wAeWbIL4NeUX8ssMHPh/view?usp=drive_link"
+                    href="https://drive.google.com/file/d/1FLGkakqaP2whIumsAi-jZsY9dCJot6WO/view?usp=sharing"
                     target="_blank"
                     rel="noopener noreferrer"
                   >

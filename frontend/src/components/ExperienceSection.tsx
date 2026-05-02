@@ -21,10 +21,10 @@ const experiences = [
     company: "Skylark Labs AI",
     period: "Jan 2024 – July 2024",
     items: [
-      "Improved video classification accuracy from 85% → 92%",
+      "Built face recognition model for CCTV surveillance achieving 97% accuracy and 92% TAR@FAR=0.01",
       "Built high-accuracy audio classification system achieving 98% accuracy",
     ],
-    metrics: ["92% video acc.", "98% audio acc."],
+    metrics: ["92% TAR@FAR=0.01", "98% audio acc."],
   },
   {
     role: "Software Engineering Intern",
